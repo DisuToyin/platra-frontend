@@ -1,20 +1,36 @@
 import React from 'react';
 
-import { Home, QrCode, ShoppingBag, Users, Settings, ForkKnife } from 'lucide-react';
+import { Home, QrCode, ShoppingBag, Users, Settings, ForkKnife, Loader2 } from 'lucide-react';
 import Header from "@/components/dashboard/Header";
 import NavItem from '@/components/dashboard/NavItem';
 import UserProfile from '@/components/dashboard/UserProfile';
 import { useAuth } from '@/hooks/useAuth';
 import { getInitials } from '@/lib/utils';
+import { Navigate } from 'react-router-dom';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { user, selectedOrganization } = useAuth() 
+  const { user, loading } = useAuth() 
 
-  console.log({selectedOrganization})
+  console.log({fromDBLayout: user})
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+      </div>
+    );
+  }
+ 
+  
+  if (user && !user.org_id || user?.org_id=="") {
+    return <Navigate to="/businesses" replace />;
+  }
+
+
 
   const navItems = [
     { to: '/', icon: Home, label: 'Dashboard' },
@@ -29,10 +45,28 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="flex h-screen bg-gray-50">
       <aside className="w-64 bg-gray-900 text-white flex flex-col">
         <div className="px-6 py-4 border-b border-gray-800">
-          <div className="text-xs text-gray-400 mb-1">Managing</div>
-          <div className="text-lg font-medium">Chef kiss</div>
+          <div className="flex items-center gap-3">
+            {user?.logo_url ? (
+              <img
+                src={user?.logo_url}
+                alt={user?.organization_name}
+                className="w-10 h-10 rounded-lg object-cover shrink-0"
+              />
+            ) : (
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                <span className="text-white font-semibold text-sm">
+                  {user?.organization_name?.slice(0, 2).toUpperCase()}
+                </span>
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <div className="text-xs text-gray-400 mb-0.5">Managing</div>
+              <div className="text-base font-medium text-white truncate">
+                {user?.organization_name}
+              </div>
+            </div>
+          </div>
         </div>
-
         <nav className="flex-1 px-2 pt-2">
           {navItems.map((item) => (
             <NavItem

@@ -73,7 +73,7 @@ const Businesses = () => {
                       : 'border-gray-100 bg-gray-50 cursor-not-allowed opacity-60'
                   }`}
                 >
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     {org.logo_url ? (
                       <img
                         src={org.logo_url}

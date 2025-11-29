@@ -17,7 +17,6 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  console.log({protected: user})
 
   if (!user) {
     return <Navigate to="/login" replace />;

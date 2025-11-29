@@ -15,7 +15,7 @@ import SettingsPage from '@/pages/Settings';
 import VerifyPage from './pages/Verify';
 import SelectBusinessPage from './pages/Businesses/Businesses';
 import CreateOrganizationPage from './pages/Businesses/Create';
-import OrganizationProtectedRoute from './components/OrganizationProtectedRoute';
+
 
 
 function App() {
@@ -64,7 +64,7 @@ function App() {
             }
           />
           
-          {/* <Route
+          <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
@@ -73,20 +73,9 @@ function App() {
                 </DashboardLayout>
               </ProtectedRoute>
             }
-          /> */}
+          /> 
 
-          <Route
-    path="/dashboard"
-    element={
-      <ProtectedRoute>
-        <OrganizationProtectedRoute>
-          <DashboardLayout>
-            <HomePage />
-          </DashboardLayout>
-        </OrganizationProtectedRoute>
-      </ProtectedRoute>
-    }
-  />
+
 
           <Route path="/" element={
             <ProtectedRoute>

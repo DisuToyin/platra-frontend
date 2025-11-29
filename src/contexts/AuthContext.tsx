@@ -17,7 +17,7 @@ interface Organization {
   address: string | null;
   phone: string | null;
   email: string | null;
-  logo_url: string | null;
+  logo_url?: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -49,8 +49,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [organizationsLoading, setOrganizationsLoading] = useState(false);
 
-
-  console.log({selectedOrganization})
 
   const checkAuth = async () => {
     try {
@@ -155,6 +153,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 
   const fetchOrganizations = async () => {
+    
     setOrganizationsLoading(true)
 
     try {
@@ -166,7 +165,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (res.ok) {
         const data = await res.json();
-        console.log({authcon: data.data})
+        // console.log({authcon: data.data})
         setOrganizations(data.data);
       }
 
@@ -178,7 +177,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const selectOrganization = async (orgId: string) => {
-    console.log("SELECTED ORGS CLICKED!")
+    // console.log("SELECTED ORGS CLICKED!")
     const org = organizations.find(o => o.id === orgId);
 
 
@@ -189,11 +188,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         headers: { 'Content-Type': 'application/json' },
       });
 
-      console.log({res})
+      // console.log({res})
 
       if (res.ok) {
         const data = await res.json();
-        console.log({authcon: data})
+        // console.log({authcon: data})
         setUser((prev: any) => ({
           ...prev,
           organization_name: org?.name,
