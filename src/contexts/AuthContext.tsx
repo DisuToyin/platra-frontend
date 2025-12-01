@@ -6,6 +6,7 @@ interface User {
   organization_name?: string;
   org_id?: string;
   display_name: string;
+  logo_url?: string;
 }
 
 interface Organization {

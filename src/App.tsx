@@ -1,13 +1,13 @@
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
-import ProtectedRoute from '@/components/ProtectedRoute';
 import LoginPage from '@/pages/Login';
 import HomePage from '@/pages/Home';
 import RegisterPage from '@/pages/Register';
+import AppLayout from './layouts/ApplicationLayout';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import PublicLayout from '@/layouts/PublicLayout';
-import MenuPage from '@/pages/Menu';
+import MenuPage from '@/pages/Menu/Menu';
 import QRCodesPage from '@/pages/QRCodes';
 import OrdersPage from '@/pages/Orders';
 import StaffPage from '@/pages/Staff';
@@ -36,91 +36,91 @@ function App() {
           } />
 
           <Route path="/verify" element={
-            <PublicLayout>
+            <AppLayout>
               <VerifyPage />
-            </PublicLayout>
+            </AppLayout>
           } />
 
 
           <Route
             path="/businesses"
             element={
-              <ProtectedRoute>
-                <PublicLayout>
+              
+                <AppLayout>
                   <SelectBusinessPage/>
-                </PublicLayout>
-              </ProtectedRoute>
+                </AppLayout>
+              
             }
           />
 
           <Route
             path="/business/create"
             element={
-              <ProtectedRoute>
-                <PublicLayout>
+              
+                <AppLayout>
                   <CreateOrganizationPage />
-                </PublicLayout>
-              </ProtectedRoute>
+                </AppLayout>
+              
             }
           />
           
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
+              
                 <DashboardLayout>
                   <HomePage/>
                 </DashboardLayout>
-              </ProtectedRoute>
+              
             }
           /> 
 
 
 
           <Route path="/" element={
-            <ProtectedRoute>
+            
               <DashboardLayout>
                 <HomePage />
               </DashboardLayout>
-            </ProtectedRoute>
+            
           } />
 
           <Route path="/menu" element={
-            <ProtectedRoute>
+            
               <DashboardLayout>
                 <MenuPage />
               </DashboardLayout>
-            </ProtectedRoute>
+            
           } />
 
           <Route path="/qr-codes" element={
-            <ProtectedRoute>
+            
               <DashboardLayout>
                 <QRCodesPage />
               </DashboardLayout>
-            </ProtectedRoute>
+            
           } />
 
           <Route path="/orders" element={
-            <ProtectedRoute>
+            
               <DashboardLayout>
                 <OrdersPage />
               </DashboardLayout>
-            </ProtectedRoute>
+            
           } />
           <Route path="/staff" element={
-            <ProtectedRoute>
+            
               <DashboardLayout>
                 <StaffPage />
               </DashboardLayout>
-            </ProtectedRoute>
+            
           } />
           <Route path="/settings" element={
-            <ProtectedRoute>
+            
               <DashboardLayout>
                 <SettingsPage />
               </DashboardLayout>
-            </ProtectedRoute>
+            
           } />
           
     

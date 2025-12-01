@@ -12,3 +12,11 @@ export function getInitials(name: string): string {
     .map(word => word.charAt(0).toUpperCase())
     .join('');
 }
+
+
+export function commaSeparatedToArray(str: string): string[] {
+  return str
+    .split(',')
+    .map(item => item.trim())
+    .filter(item => item !== '');
+}

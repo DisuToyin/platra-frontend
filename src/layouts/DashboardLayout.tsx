@@ -14,9 +14,7 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, loading } = useAuth() 
-
-  console.log({fromDBLayout: user})
-  
+ 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -24,13 +22,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
     );
   }
- 
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
   
   if (user && !user.org_id || user?.org_id=="") {
     return <Navigate to="/businesses" replace />;
   }
-
-
 
   const navItems = [
     { to: '/', icon: Home, label: 'Dashboard' },
@@ -44,24 +43,28 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="flex h-screen bg-gray-50">
       <aside className="w-64 bg-gray-900 text-white flex flex-col">
-        <div className="px-6 py-4 border-b border-gray-800">
+
+        <div className="px-6 py-4 border-b border-gray-800 bg-gray-900/50">
           <div className="flex items-center gap-3">
-            {user?.logo_url ? (
-              <img
-                src={user?.logo_url}
-                alt={user?.organization_name}
-                className="w-10 h-10 rounded-lg object-cover shrink-0"
-              />
-            ) : (
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
-                <span className="text-white font-semibold text-sm">
-                  {user?.organization_name?.slice(0, 2).toUpperCase()}
-                </span>
-              </div>
-            )}
+            <div className="relative">
+              {user?.logo_url ? (
+                <img
+                  src={user?.logo_url}
+                  alt={user?.organization_name}
+                  className="w-11 h-11 rounded-xl object-cover border-2 border-gray-700"
+                />
+              ) : (
+                <div className="w-11 h-11 bg-linear-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center border-2 border-gray-700">
+                  <span className="text-white font-bold text-sm">
+                    {user?.organization_name?.slice(0, 2).toUpperCase()}
+                  </span>
+                </div>
+              )}
+              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-600 rounded-full border-2 border-gray-900"></div>
+            </div>
             <div className="flex-1 min-w-0">
-              <div className="text-xs text-gray-400 mb-0.5">Managing</div>
-              <div className="text-base font-medium text-white truncate">
+              <div className="text-xs font-medium text-blue-400 mb-0.5">Managing</div>
+              <div className="text-sm font-semibold text-white truncate">
                 {user?.organization_name}
               </div>
             </div>
