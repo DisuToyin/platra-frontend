@@ -4,10 +4,10 @@ import type { MenuItem } from '@/types/menu';
 interface MenuItemListProps {
   item: MenuItem;
   formatPrice: (price: number) => string;
-  onEdit: (item: MenuItem) => void;
+  handleMenuItemSuccess: () => void;
 }
 
-export const MenuItemList: React.FC<MenuItemListProps> = ({ item, formatPrice, onEdit }) => {
+export const MenuItemList: React.FC<MenuItemListProps> = ({ item, formatPrice, handleMenuItemSuccess }) => {
   return (
     <div className={`bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-all ${
       !item.is_available ? 'opacity-60' : ''
@@ -77,7 +77,7 @@ export const MenuItemList: React.FC<MenuItemListProps> = ({ item, formatPrice, o
               )}
             </div>
             <button 
-              onClick={() => onEdit(item)}
+              onClick={() => {}}
               className="text-blue-600 font-medium hover:text-blue-700"
             >
               Edit Item

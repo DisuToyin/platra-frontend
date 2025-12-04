@@ -1,23 +1,51 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
-interface CreateMenuCategoryFormProps {
+interface MenuCategory {
+  id?: string;
+  name: string;
+  description: string;
+  display_order: number;
+  is_active: boolean;
+}
+
+interface MenuCategoryFormProps {
+  mode?: "create" | "edit";
+  category?: MenuCategory | null;
   onSuccess: () => void;
   onCancel: () => void;
 }
 
-export const CreateMenuCategoryForm: React.FC<CreateMenuCategoryFormProps> = ({
+export const CreateMenuCategoryForm: React.FC<MenuCategoryFormProps> = ({
+  mode = "create",
+  category = null,
   onSuccess,
   onCancel,
 }) => {
-  const {user} = useAuth()
+  const { user } = useAuth();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [displayOrder, setDisplayOrder] = useState(0);
   const [isActive, setIsActive] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Initialize form with category data when in edit mode
+  useEffect(() => {
+    if (mode === "edit" && category) {
+      setName(category.name || "");
+      setDescription(category.description || "");
+      setDisplayOrder(category.display_order || 0);
+      setIsActive(category.is_active ?? true);
+    } else {
+      // Reset form for create mode
+      setName("");
+      setDescription("");
+      setDisplayOrder(0);
+      setIsActive(true);
+    }
+  }, [mode, category]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,8 +59,14 @@ export const CreateMenuCategoryForm: React.FC<CreateMenuCategoryFormProps> = ({
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/organizations/${user?.org_id}/categories`, {
-        method: "POST",
+      const url = mode === "edit" && category?.id
+        ? `${import.meta.env.VITE_API_BASE_URL}/organizations/${user?.org_id}/categories/${category.id}`
+        : `${import.meta.env.VITE_API_BASE_URL}/organizations/${user?.org_id}/categories`;
+
+      const method = mode === "edit" ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -48,18 +82,34 @@ export const CreateMenuCategoryForm: React.FC<CreateMenuCategoryFormProps> = ({
       if (res.ok) {
         onSuccess();
       } else {
-        setError(data.message || "Failed to create category");
+        setError(data.message || `Failed to ${mode === "edit" ? "update" : "create"} category`);
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
-      console.error("Create category error:", err);
+      console.error(`${mode === "edit" ? "Update" : "Create"} category error:`, err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const isFormDirty = () => {
+    if (mode === "create") {
+      return !name.trim();
+    }
+
+    if (!category) return true;
+
+    return (
+      name.trim() === category.name &&
+      (description.trim() || "") === (category.description || "") &&
+      displayOrder === (category.display_order || 0) &&
+      isActive === (category.is_active ?? true)
+    );
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4 text-sm tracking-tighter">
+
       {error && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-md">
           <p className="text-sm text-red-500">{error}</p>
@@ -82,7 +132,6 @@ export const CreateMenuCategoryForm: React.FC<CreateMenuCategoryFormProps> = ({
         />
       </div>
 
-      {/* Description Field */}
       <div>
         <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
           Description (Optional)
@@ -97,7 +146,6 @@ export const CreateMenuCategoryForm: React.FC<CreateMenuCategoryFormProps> = ({
         />
       </div>
 
-      {/* Display Order Field */}
       <div>
         <label htmlFor="display_order" className="block text-sm font-medium text-gray-700 mb-2">
           Display Order
@@ -115,7 +163,6 @@ export const CreateMenuCategoryForm: React.FC<CreateMenuCategoryFormProps> = ({
         </p>
       </div>
 
-      {/* Is Active Checkbox */}
       <div className="flex items-start gap-3">
         <input
           id="is_active"
@@ -134,7 +181,6 @@ export const CreateMenuCategoryForm: React.FC<CreateMenuCategoryFormProps> = ({
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="flex gap-3 pt-4 border-t border-t-gray-200 mt-4">
         <button
           type="button"
@@ -146,16 +192,16 @@ export const CreateMenuCategoryForm: React.FC<CreateMenuCategoryFormProps> = ({
         </button>
         <button
           type="submit"
-          disabled={isLoading || !name.trim()}
+          disabled={isLoading || isFormDirty()}
           className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isLoading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Creating...
+              {mode === "edit" ? "Updating..." : "Creating..."}
             </>
           ) : (
-            "Create Category"
+            `${mode === "edit" ? "Update" : "Create"} Category`
           )}
         </button>
       </div>

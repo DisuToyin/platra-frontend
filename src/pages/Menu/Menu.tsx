@@ -7,6 +7,7 @@ import type { MenuCategory, MenuItem } from '@/types/menu';
 import { CreateMenuItemForm } from '@/components/forms/MenuItemForm';
 import { Modal } from '@/components/ui/modal';
 import { CreateMenuCategoryForm } from '@/components/forms/MenuCategoryForm';
+import ErrorMessage from '@/components/Error';
 
 const MenuPage = () => {
   const { user } = useAuth();
@@ -19,6 +20,7 @@ const MenuPage = () => {
 
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isMenuItemModalOpen, setIsMenuItemModalOpen] = useState(false);
+
 
   useEffect(() => {
     fetchMenu();
@@ -34,12 +36,12 @@ const MenuPage = () => {
 
   const handleCategorySuccess = () => {
     setIsCategoryModalOpen(false);
-    fetchMenu(); // Refresh the menu data
+    fetchMenu(); 
   };
 
   const handleMenuItemSuccess = () => {
     setIsMenuItemModalOpen(false);
-    fetchMenu(); // Refresh the menu data
+    fetchMenu();
   };
 
 
@@ -62,6 +64,7 @@ const MenuPage = () => {
       }
 
       const data = await response.json();
+      console.log(data)
       setCategories(data.data || []);
       
       if (data.data && data.data.length > 0) {
@@ -77,10 +80,6 @@ const MenuPage = () => {
 
   const formatPrice = (price: number) => {
     return `₦${price.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  };
-
-  const handleEditItem = (item: MenuItem) => {
-    console.log('Edit item:', item);
   };
 
   const handleToggleAvailability = (item: MenuItem) => {
@@ -113,9 +112,8 @@ const MenuPage = () => {
 
   const totalItems = categories?.reduce((sum, cat) => sum + cat?.items?.length, 0);
 
-  // Loading, Error, and Empty states remain the same...
   if (loading) return <LoadingState />;
-  if (error) return <ErrorState error={error} onRetry={fetchMenu} />;
+  if (error) return <ErrorMessage error={error}/>;
   if (categories?.length === 0) return <EmptyState />;
 
   return (
@@ -133,7 +131,6 @@ const MenuPage = () => {
         onAddItem={handleAddItem}
       />
 
-      {/* Menu Content */}
       <div className="space-y-12">
         {filteredCategories.map(category => {
           const filteredItems = getFilteredItems(category?.items);
@@ -145,8 +142,10 @@ const MenuPage = () => {
               category={{ ...category, items: filteredItems }}
               viewMode={viewMode}
               formatPrice={formatPrice}
-              onEditItem={handleEditItem}
               onToggleAvailability={handleToggleAvailability}
+              handleCategorySuccess={handleCategorySuccess}
+              handleMenuItemSuccess={handleMenuItemSuccess}
+              categories={categories}
             />
           );
         })}
@@ -164,6 +163,7 @@ const MenuPage = () => {
         <CreateMenuCategoryForm
           onSuccess={handleCategorySuccess}
           onCancel={() => setIsCategoryModalOpen(false)}
+          mode="create"
         />
       </Modal>
 
@@ -179,6 +179,8 @@ const MenuPage = () => {
           onSuccess={handleMenuItemSuccess}
           onCancel={() => setIsMenuItemModalOpen(false)}
           categories={categories}
+          mode="create"
+
         />
       </Modal>
     </div>
@@ -192,20 +194,6 @@ const LoadingState = () => (
   </div>
 );
 
-const ErrorState = ({ error, onRetry }: { error: string; onRetry: () => void }) => (
-  <div className="max-w-7xl mx-auto px-4 py-8">
-    <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-      <h3 className="text-red-600 font-semibold mb-2">Error Loading Menu</h3>
-      <p className="text-red-700 mb-4">{error}</p>
-      <button
-        onClick={onRetry}
-        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all"
-      >
-        Try Again
-      </button>
-    </div>
-  </div>
-);
 
 const EmptyState = () => (
   <div className="max-w-7xl mx-auto px-4 py-8 text-sm tracking-tighter">

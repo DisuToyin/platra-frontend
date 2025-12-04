@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Home, QrCode, ShoppingBag, Users, Settings, ForkKnife, Loader2 } from 'lucide-react';
+import { Home, QrCode, ShoppingBag, Users, Settings, ForkKnife, Loader2, CreditCardIcon, HandCoinsIcon, BanknoteArrowDown } from 'lucide-react';
 import Header from "@/components/dashboard/Header";
 import NavItem from '@/components/dashboard/NavItem';
 import UserProfile from '@/components/dashboard/UserProfile';
@@ -14,6 +14,7 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, loading } = useAuth() 
+  console.log(user)
  
   if (loading) {
     return (
@@ -35,8 +36,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { to: '/', icon: Home, label: 'Dashboard' },
     { to: '/menu', icon: ForkKnife, label: 'Menu' },
     { to: '/qrcodes', icon: QrCode, label: 'QR Codes' },
-    { to: '/orders', icon: ShoppingBag, label: 'Orders' },
     { to: '/staff', icon: Users, label: 'Staff' },
+    { to: '/orders', icon: ShoppingBag, label: 'Orders' },
+    { to: '/payments', icon: CreditCardIcon, label: 'Payment' },
+    { to: '/settlements', icon: HandCoinsIcon, label: 'Settlements & Payouts' },
+    { to: '/fees', icon: BanknoteArrowDown, label: 'Fees' },
     { to: '/settings', icon: Settings, label: 'Settings' },
   ];
 
@@ -84,7 +88,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="p-4 border-t border-gray-800">
           {user && <UserProfile
             display_name={user.display_name}
-            role="Restaurant Owner"
+            role={user?.org_role}
             initials={getInitials(user.display_name)}
           /> }
 

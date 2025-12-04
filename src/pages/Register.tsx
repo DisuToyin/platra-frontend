@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -12,9 +12,20 @@ const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isInvitee, setIsInvitee] = useState(false)
   
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const inviteEmail = sessionStorage.getItem('inviteEmail');
+    
+    if (inviteEmail) {
+      setIsInvitee(true)
+      setEmail(inviteEmail);
+    }
+  }, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,12 +33,29 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      const success = await register(firstName, lastName, email, password);
-      console.log({success})
+      const success = await register(firstName, lastName, email, password, isInvitee);
+      console.log({success, isInvitee})
       
-      if (success) {
+      if (success && !isInvitee) {
         navigate('/verify');
-      } else {
+      }else if (success && isInvitee) {
+        const inviteToken = sessionStorage.getItem('inviteToken');
+        const inviteAccepted = sessionStorage.getItem('inviteAccepted');
+
+        if (inviteToken && inviteAccepted === 'true') {
+          try {
+            await completeInviteAfterRegistration(inviteToken);
+          } catch (err) {
+            console.error('Error completing invite:', err);
+          }
+          
+          sessionStorage.removeItem('inviteToken');
+          sessionStorage.removeItem('inviteEmail');
+          sessionStorage.removeItem('inviteAccepted');
+        }
+        navigate('/businesses')
+      }
+       else {
         setError('An error occured');
       }
     } catch (error) {
@@ -35,6 +63,34 @@ const LoginPage = () => {
       console.error('Login error:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const completeInviteAfterRegistration = async (token: string) => {
+    console.log("completeInvite")
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/invites/${token}/complete`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        }
+      );
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        return data;
+      } else {
+        throw new Error(data.message || 'Failed to complete invitation');
+      }
+    } catch (error: any) {
+      console.error('Error completing invite:', error);
+      throw error;
     }
   };
 

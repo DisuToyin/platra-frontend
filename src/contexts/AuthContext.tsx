@@ -7,6 +7,7 @@ interface User {
   org_id?: string;
   display_name: string;
   logo_url?: string;
+  org_role?: string;
 }
 
 interface Organization {
@@ -33,7 +34,7 @@ interface AuthContextType {
   selectedOrganization: Organization | null;
   organizations: Organization[];
   login: (email: string, password: string) => Promise<any>;
-  register: (firstName: string, lastName: string, email: string, password: string) => Promise<boolean>;
+  register: (firstName: string, lastName: string, email: string, password: string, is_invitee: boolean) => Promise<boolean>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
   fetchOrganizations: () => Promise<void>;
@@ -76,7 +77,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkAuth();
   }, []);
 
-  const register = async (firstName: string, lastName: string, email: string, password: string): Promise<boolean> => {
+  const register = async (firstName: string, lastName: string, email: string, password: string, is_invitee: boolean): Promise<boolean> => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
         method: 'POST',
@@ -85,7 +86,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         body: JSON.stringify({ 
           display_name: firstName + ' ' + lastName, 
           email, 
-          password 
+          password, 
+          is_invitee,
         }),
       });
 
@@ -191,13 +193,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // console.log({res})
 
+
       if (res.ok) {
         const data = await res.json();
-        // console.log({authcon: data})
+        console.log({authcon: data})
         setUser((prev: any) => ({
           ...prev,
           organization_name: org?.name,
           org_id: org?.id,
+          org_role: user?.id === org?.owner_id ? "owner" : "staff",
         }));
 
         setSelectedOrganization(data)

@@ -1,11 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {  Plus, ChevronRight, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import ErrorMessage from '@/components/Error';
 
 const Businesses = () => {
   const {fetchOrganizations, organizations, selectOrganization, organizationsLoading} = useAuth()
   const navigate = useNavigate();
+  const [error, setError] = useState<string>()
+  // console.log(organizations)
 
   useEffect(() => {
     fetchOrganizations()
@@ -18,6 +21,7 @@ const Businesses = () => {
     if(res == true ){
       navigate('/dashboard');
     }else{
+      setError("Failed to select an organization - Please try again later")
       console.log("FAILED TO SELECT")
     }
   };
@@ -60,6 +64,7 @@ const Businesses = () => {
             Choose a business to continue
           </p>
         </div>
+        {error && <ErrorMessage error={error}/>}
           <>
             <div className="space-y-3 mb-6">
               {organizations?.map((org) => (

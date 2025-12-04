@@ -20,3 +20,10 @@ export function commaSeparatedToArray(str: string): string[] {
     .map(item => item.trim())
     .filter(item => item !== '');
 }
+
+ export  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN'
+    }).format(price);
+  };

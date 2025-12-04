@@ -79,7 +79,7 @@ export const MenuHeader: React.FC<MenuHeaderProps> = ({
           ))}
         </select>
 
-        <div className="flex gap-2 bg-gray-100 rounded-lg p-1">
+        {/* <div className="flex gap-2 bg-gray-100 rounded-lg p-1">
           <button
             onClick={() => onViewModeChange('grid')}
             className={`p-2 rounded ${viewMode === 'grid' ? 'bg-white shadow' : 'text-gray-600'}`}
@@ -92,7 +92,7 @@ export const MenuHeader: React.FC<MenuHeaderProps> = ({
           >
             <List size={20} />
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
